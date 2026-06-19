@@ -24,27 +24,41 @@ public class PersistenceInMemory: IPersistence
         return _specialities.SingleOrDefault(e => e.Id == id);
     }
 
+    public IEnumerable<Doctor> GetActiveDoctors()
+    {
+        return _doctors.Where(d => d.IsActive);
+    }
+
+    public Doctor? GetActiveDoctorById(Guid id)
+    {
+        return _doctors.SingleOrDefault(d => d.Id == id && d.IsActive);
+    }
+
     public void SaveDoctor(Doctor doctor)
     {
         _doctors.Add(doctor);
     }
 
+    public void DeactivateDoctor(Doctor doctor)
+    {
+        doctor.Deactivate();
+    }
+
     private void LoadSpecialities()
     {
+        string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sources", "specialities.json");
+
         try
         {
-            string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Sources", "specialities.json");
-
             var json = File.ReadAllText(jsonPath);
             var specialities = JsonSerializer.Deserialize<List<SpecialityDto>>(json, new JsonSerializerOptions(){
                 PropertyNameCaseInsensitive = true
             })?? [];
             _specialities = [.. specialities.Select(s => new Speciality(s.Name, s.Description, s.Id))];
         }
-        catch (Exception)
+        catch (Exception exception)
         {
-            
-
+            throw new InvalidOperationException($"No se pudieron cargar las especialidades desde {jsonPath}.", exception);
         }
     }
 
