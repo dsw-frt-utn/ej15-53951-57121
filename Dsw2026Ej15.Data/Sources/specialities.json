@@ -1,0 +1,17 @@
+[
+  {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "name": "Cardiología",
+    "description": "Especialidad encargada de las enfermedades del corazón"
+  },
+  {
+    "id": "7bc9ef12-1234-5678-abcd-ef1234567890",
+    "name": "Pediatría",
+    "description": "Atención médica integral para bebés y niños"
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+    "name": "Traumatología",
+    "description": "Estudio y tratamiento de lesiones óseas"
+  }
+]
