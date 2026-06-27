@@ -19,29 +19,41 @@ public class PersistenceInMemory: IPersistence
         LoadSpecialities();
     }
 
-    public Speciality? GetSpecialityById(Guid id)
+    public async Task<Speciality?> GetSpecialityById(Guid id)
     {
-        return _specialities.SingleOrDefault(e => e.Id == id);
+        return await Task.FromResult(_specialities.SingleOrDefault(e => e.Id == id));
     }
 
-    public IEnumerable<Doctor> GetActiveDoctors()
+ 
+    public async Task<IEnumerable<Doctor>> GetActiveDoctors()
     {
-        return _doctors.Where(d => d.IsActive);
+        return await Task.FromResult(_doctors.Where(d => d.IsActive));
     }
 
-    public Doctor? GetActiveDoctorById(Guid id)
+
+    public async Task<Doctor?> GetActiveDoctorById(Guid id)
     {
-        return _doctors.SingleOrDefault(d => d.Id == id && d.IsActive);
+        return await Task.FromResult(_doctors.SingleOrDefault(d => d.Id == id && d.IsActive));
     }
 
-    public void SaveDoctor(Doctor doctor)
+   
+    public async Task SaveDoctor(Doctor doctor)
     {
         _doctors.Add(doctor);
+        await Task.CompletedTask; 
     }
 
-    public void DeactivateDoctor(Doctor doctor)
+
+    public async Task UpdateDoctor(Doctor doctor)
     {
-        doctor.Deactivate();
+       
+        await Task.CompletedTask;
+    }
+
+  
+    public async Task<Doctor?> GetDoctorById(Guid id)
+    {
+        return await Task.FromResult(_doctors.SingleOrDefault(d => d.Id == id));
     }
 
     private void LoadSpecialities()

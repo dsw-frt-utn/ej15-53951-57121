@@ -3,6 +3,8 @@ using Dsw2026Ej15.Data;
 using Dsw2026Ej15.Domain.Exceptions;
 using Dsw2026Ej15.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Dsw2026Ej15.Api
 {
@@ -12,14 +14,21 @@ namespace Dsw2026Ej15.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Database= Dsw2026Ej15;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True";
+
             // Agregar servicios al contenedor.
        
 
             builder.Services.AddControllers();
             // Configuracion de OpenAPI.
             //builder.Services.AddOpenApi();}
+            builder.Services.AddDbContext<Dsw2026Ej15DbContext>(Options =>
+            {
+                Options.UseSqlServer(connectionString);
+            }
+            );
             builder.Services.AddSwaggerGen();
-            builder.Services.AddSingleton<IPersistence, PersistenceInMemory>();
+            builder.Services.AddScoped<IPersistence, PersistenceEf>();
             builder.Services.AddHealthChecks();
 
             var app = builder.Build();

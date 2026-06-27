@@ -16,7 +16,7 @@ public class DoctorsController : AppControllers
     }
 
     [HttpPost("doctors")]
-    public IActionResult CreateDoctor(DoctorModel.Request request)
+    public async Task<IActionResult> CreateDoctor(DoctorModel.Request request)
     {
         if (string.IsNullOrWhiteSpace(request.Name))
         {
@@ -28,14 +28,14 @@ public class DoctorsController : AppControllers
             throw new ValidationException("La matricula es requerida.");
         }
 
-        var speciality = _persistence.GetSpecialityById(request.SpecialityId);
+       var speciality = await _persistence.GetSpecialityById(request.SpecialityId);
         if (speciality is null)
         {
             throw new ValidationException($"No existe la especialidad con ID {request.SpecialityId}.");
         }
 
         var doctor = new Doctor(request.Name, request.LicenseNumber, speciality);
-        _persistence.SaveDoctor(doctor);
+        await _persistence.SaveDoctor(doctor);
 
         return CreatedAtAction(
             nameof(GetActiveDoctorById),
@@ -44,19 +44,18 @@ public class DoctorsController : AppControllers
     }
 
     [HttpGet("doctors")]
-    public IActionResult GetActiveDoctors()
+    public async Task<IActionResult> GetActiveDoctors()
     {
-        var doctors = _persistence
-            .GetActiveDoctors()
+        var doctors = (await _persistence.GetActiveDoctors())
             .Select(ToResponse);
 
         return Ok(doctors);
     }
 
     [HttpGet("doctors/{id:guid}")]
-    public IActionResult GetActiveDoctorById(Guid id)
+    public async Task<IActionResult> GetActiveDoctorById(Guid id)
     {
-        var doctor = _persistence.GetActiveDoctorById(id);
+        var doctor = await _persistence.GetDoctorById(id);
         if (doctor is null)
         {
             return NotFound();
@@ -66,15 +65,15 @@ public class DoctorsController : AppControllers
     }
 
     [HttpDelete("doctors/{id:guid}")]
-    public IActionResult DeleteDoctor(Guid id)
+    public async Task<IActionResult> DeleteDoctor(Guid id)
     {
-        var doctor = _persistence.GetActiveDoctorById(id);
+        var doctor = await _persistence.GetDoctorById(id);
         if (doctor is null)
         {
             return NotFound();
         }
 
-        _persistence.DeactivateDoctor(doctor);
+        await _persistence.UpdateDoctor(doctor);
 
         return NoContent();
     }
