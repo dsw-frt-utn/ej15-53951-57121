@@ -3,6 +3,7 @@ using Dsw2026Ej15.Data;
 using Dsw2026Ej15.Domain.Exceptions;
 using Dsw2026Ej15.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dsw2026Ej15.Api
 {
@@ -19,7 +20,14 @@ namespace Dsw2026Ej15.Api
             // Configuracion de OpenAPI.
             //builder.Services.AddOpenApi();}
             builder.Services.AddSwaggerGen();
-            builder.Services.AddSingleton<IPersistence, PersistenceInMemory>();
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+            // Se utiliza SQLite por una limitacion del entorno: la VM de desarrollo corre Windows ARM64.
+            // SQL Server LocalDB depende de componentes nativos x64 y falla al cargar SQLUserInstance.dll.
+            builder.Services.AddDbContext<DoctorsDbContext>(options =>
+                options.UseSqlite(connectionString));
+            builder.Services.AddScoped<IPersistence, PersistenceEf>();
             builder.Services.AddHealthChecks();
 
             var app = builder.Build();
